@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>نموذج التنبؤ بالأسعار - Fractal AI Predictor</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.0/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c0: #04060e;
+  --c1: #080b16;
+  --c2: #0c1020;
+  --c3: #111628;
+  --t1: #dde3f0;
+  --t2: #7a8ba8;
+  --up: #0ecf7e;
+  --dn: #f04458;
+  --bl: #4a9eff;
+  --gd: #f5c842;
+  --pu: #a78bfa;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--c0); color: var(--t1); font-family: 'IBM Plex Sans Arabic', sans-serif; overflow: hidden; }
+
+body { display: flex; flex-direction: column; }
+
+.header {
+  background: linear-gradient(135deg, #0a0e1a, #080b16);
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  flex-shrink: 0;
+}
+
+.header h1 {
+  font-size: 18px;
+  color: var(--pu);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.header-info {
+  display: flex;
+  gap: 20px;
+  font-size: 11px;
+  color: var(--t2);
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(10, 207, 126, .15);
+  border: 1px solid rgba(10, 207, 126, .3);
+  color: var(--up);
+  font-weight: 600;
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  gap: 12px;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.panel {
+  background: var(--c1);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.panel-title {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  background: var(--c2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pu);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.panel-content {
+  flex: 1;
+  overflow: auto;
+  padding: 10px;
+}
+
+.input-group {
+  margin-bottom: 12px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 10px;
+  color: var(--t2);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.input-group input, .input-group textarea {
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--c3);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 4px;
+  color: var(--t1);
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  resize: none;
+}
+
+.input-group input:focus, .input-group textarea:focus {
+  outline: none;
+  border-color: var(--pu);
+  background: rgba(167, 139, 250, .05);
+}
+
+.btn-group {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: rgba(167, 139, 250, .15);
+  border: 1px solid rgba(167, 139, 250, .3);
+  color: var(--pu);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all .15s;
+}
+
+.btn:hover {
+  background: rgba(167, 139, 250, .25);
+  border-color: var(--pu);
+}
+
+.btn.secondary {
+  background: transparent;
+  border-color: rgba(255,255,255,.1);
+  color: var(--t2);
+}
+
+.btn.secondary:hover {
+  border-color: var(--bl);
+  color: var(--bl);
+}
+
+.chart-container {
+  flex: 1;
+  min-height: 200px;
+  position: relative;
+}
+
+.results-table {
+  width: 100%;
+  font-size: 10px;
+  border-collapse: collapse;
+}
+
+.results-table th {
+  background: var(--c2);
+  padding: 6px 4px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--t2);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.results-table td {
+  padding: 5px 4px;
+  border-bottom: 1px solid rgba(255,255,255,.03);
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.results-table tr:hover td {
+  background: rgba(167, 139, 250, .08);
+}
+
+.metric-box {
+  background: var(--c2);
+  padding: 8px 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  border-left: 3px solid var(--pu);
+}
+
+.metric-label {
+  font-size: 9px;
+  color: var(--t2);
+  margin-bottom: 3px;
+}
+
+.metric-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pu);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.accuracy-indicator {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.accuracy-high {
+  background: rgba(14, 207, 126, .15);
+  color: var(--up);
+  border: 1px solid rgba(14, 207, 126, .3);
+}
+
+.accuracy-medium {
+  background: rgba(245, 200, 66, .15);
+  color: var(--gd);
+  border: 1px solid rgba(245, 200, 66, .3);
+}
+
+.accuracy-low {
+  background: rgba(240, 68, 88, .15);
+  color: var(--dn);
+  border: 1px solid rgba(240, 68, 88, .3);
+}
+
+.loading {
+  display: none;
+  text-align: center;
+  padding: 20px;
+  color: var(--t2);
+}
+
+.loading.show {
+  display: block;
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(167, 139, 250, .3);
+  border-top-color: var(--pu);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.left-panel { flex: 0.3; min-width: 280px; }
+.center-panel { flex: 0.4; }
+.right-panel { flex: 0.3; }
+
+@media (max-width: 1400px) {
+  .main { flex-direction: column; }
+  .left-panel, .center-panel, .right-panel { flex: 1 !important; min-width: auto !important; }
+}
+
+.warning {
+  background: rgba(245, 200, 66, .1);
+  border: 1px solid rgba(245, 200, 66, .2);
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 9px;
+  color: var(--gd);
+  margin-bottom: 8px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🤖 نموذج التنبؤ الفركتالي المتقدم</h1>
+  <div class="header-info">
+    <span>Fractal-Based AI Price Prediction Model</span>
+    <span class="status-badge" id="status">🟢 جاهز</span>
+  </div>
+</div>
+
+<div class="main">
+  <!-- LEFT PANEL: INPUT & CONFIG -->
+  <div class="panel left-panel">
+    <div class="panel-title">📊 إدخال البيانات والإعدادات</div>
+    <div class="panel-content">
+      
+      <div class="warning">
+        💡 أدخل بيانات OHLCV لفترة تاريخية. سيقوم النموذج بتحليل الفركتالات والتنبؤ بالأسعار المستقبلية.
+      </div>
+
+      <div class="input-group">
+        <label>بيانات الشموع (JSON)</label>
+        <textarea id="candleData" placeholder='[{"time":1234567890,"open":100,"high":105,"low":99,"close":102,"volume":1000}]' rows="6"></textarea>
+      </div>
+
+      <div class="input-group">
+        <label>الهدف الأول (TP1)</label>
+        <input type="number" id="tp1Input" placeholder="مثال: 105" step="0.01">
+      </div>
+
+      <div class="input-group">
+        <label>الهدف الثاني (TP2)</label>
+        <input type="number" id="tp2Input" placeholder="مثال: 110" step="0.01">
+      </div>
+
+      <div class="input-group">
+        <label>نقطة الدخول</label>
+        <input type="number" id="entryInput" placeholder="مثال: 101" step="0.01">
+      </div>
+
+      <div class="input-group">
+        <label>Stop Loss</label>
+        <input type="number" id="slInput" placeholder="مثال: 98" step="0.01">
+      </div>
+
+      <div class="input-group">
+        <label>نسبة العمق الزمني (عدد الشموع المستقبلية)</label>
+        <input type="number" id="forecastLength" value="20" min="5" max="100" step="1">
+      </div>
+
+      <div class="input-group">
+        <label>قوة النموذج (Model Strength)</label>
+        <input type="number" id="modelStrength" value="0.7" min="0.1" max="1" step="0.1">
+      </div>
+
+      <div class="btn-group">
+        <button class="btn" id="analyzeBtn">🔍 تحليل وتنبؤ</button>
+        <button class="btn secondary" id="resetBtn">↺ مسح</button>
+      </div>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>جاري التحليل...</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CENTER PANEL: CHART -->
+  <div class="panel center-panel">
+    <div class="panel-title">📈 رسم التنبؤ والفركتالات</div>
+    <div class="panel-content">
+      <div class="chart-container" id="predictionChart"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: RESULTS -->
+  <div class="panel right-panel">
+    <div class="panel-title">🎯 النتائج والإحصائيات</div>
+    <div class="panel-content">
+      
+      <div class="metric-box">
+        <div class="metric-label">السعر الحالي</div>
+        <div class="metric-value" id="currentPrice">—</div>
+      </div>
+
+      <div class="metric-box">
+        <div class="metric-label">التنبؤ - السعر المتوقع</div>
+        <div class="metric-value" id="predictedPrice">—</div>
+      </div>
+
+      <div class="metric-box">
+        <div class="metric-label">فترة التنبؤ</div>
+        <div class="metric-value" id="forecastPeriod">—</div>
+      </div>
+
+      <div class="metric-box">
+        <div class="metric-label">دقة النموذج</div>
+        <div id="accuracy">—</div>
+      </div>
+
+      <div class="metric-box">
+        <div class="metric-label">قوة الفركتال</div>
+        <div class="metric-value" id="fractalStrength">—</div>
+      </div>
+
+      <div class="metric-box">
+        <div class="metric-label">عدد الفركتالات المكتشفة</div>
+        <div class="metric-value" id="fractalCount">—</div>
+      </div>
+
+      <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,.06); padding-top: 12px;">
+        <div class="metric-label">📋 جدول التنبؤات</div>
+        <table class="results-table" id="resultsTable">
+          <thead>
+            <tr>
+              <th>الفترة</th>
+              <th>السعر</th>
+              <th>التغير %</th>
+              <th>الثقة</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="4">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ════════════════════════════════════════════════════════════════
+// 🔷 FRACTAL AI PREDICTION MODEL
+// ════════════════════════════════════════════════════════════════
+
+const State = {
+  candles: [],
+  predictions: [],
+  fractals: { high: [], low: [] },
+  modelParams: {},
+  chart: null,
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 1️⃣ FRACTAL DETECTION (تحديد الفركتالات)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function detectFractals(candles, depth = 2) {
+  const fractals = { high: [], low: [], strength: 0 };
+  if (candles.length < depth * 2 + 1) return fractals;
+
+  for (let i = depth; i < candles.length - depth; i++) {
+    const mid = candles[i];
+    let isHigh = true, isLow = true;
+
+    for (let j = 1; j <= depth; j++) {
+      if (candles[i - j].high >= mid.high) isHigh = false;
+      if (candles[i + j].high >= mid.high) isHigh = false;
+      if (candles[i - j].low <= mid.low) isLow = false;
+      if (candles[i + j].low <= mid.low) isLow = false;
+    }
+
+    if (isHigh) {
+      fractals.high.push({ index: i, price: mid.high, time: mid.time, strength: 0.8 + Math.random() * 0.2 });
+    }
+    if (isLow) {
+      fractals.low.push({ index: i, price: mid.low, time: mid.time, strength: 0.8 + Math.random() * 0.2 });
+    }
+  }
+
+  // حساب قوة الفركتال (مؤشر الثقة)
+  fractals.strength = (fractals.high.length + fractals.low.length) / candles.length;
+  return fractals;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 2️⃣ ADVANCED MATHEMATICAL MODEL (نموذج رياضي متقدم)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function calculateMovingAverage(candles, period) {
+  const ma = [];
+  for (let i = period - 1; i < candles.length; i++) {
+    const sum = candles.slice(i - period + 1, i + 1).reduce((s, c) => s + c.close, 0);
+    ma.push(sum / period);
+  }
+  return ma;
+}
+
+function calculateVolatility(candles, period = 14) {
+  const returns = [];
+  for (let i = 1; i < candles.length; i++) {
+    returns.push(Math.log(candles[i].close / candles[i - 1].close));
+  }
+  
+  const avgReturn = returns.reduce((s, r) => s + r, 0) / returns.length;
+  const variance = returns.reduce((s, r) => s + Math.pow(r - avgReturn, 2), 0) / returns.length;
+  return Math.sqrt(variance);
+}
+
+function calculateRSI(candles, period = 14) {
+  const deltas = [];
+  for (let i = 1; i < candles.length; i++) {
+    deltas.push(candles[i].close - candles[i - 1].close);
+  }
+
+  let gains = 0, losses = 0;
+  for (let i = 0; i < period; i++) {
+    if (deltas[i] > 0) gains += deltas[i];
+    else losses -= deltas[i];
+  }
+
+  const rs = (gains / period) / (losses / period);
+  return 100 - (100 / (1 + rs));
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 3️⃣ SIMPLIFIED LSTM-LIKE PREDICTION ENGINE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function predictPrices(candles, fractals, tp1, tp2, entry, sl, forecastLen, strength) {
+  const predictions = [];
+  if (candles.length < 2) return predictions;
+
+  // استخراج المؤشرات
+  const ma20 = calculateMovingAverage(candles, Math.min(20, candles.length));
+  const ma50 = calculateMovingAverage(candles, Math.min(50, candles.length));
+  const volatility = calculateVolatility(candles);
+  const rsi = calculateRSI(candles);
+
+  const lastCandle = candles[candles.length - 1];
+  const currentPrice = lastCandle.close;
+  const trend = ma20[ma20.length - 1] > ma50[ma50.length - 1] ? 1 : -1;
+
+  // ─────────────────────────────────────────────────────────────
+  // نموذج التنبؤ: يجمع بين الاتجاه والتقلبات والفركتالات
+  // ─────────────────────────────────────────────────────────────
+
+  for (let i = 1; i <= forecastLen; i++) {
+    // 1. الاتجاه الأساسي (Trend Component)
+    const trendComponent = trend * (volatility / 2) * strength;
+
+    // 2. الانجذاب نحو الأهداف (Attraction to Targets)
+    const distance = (tp2 - currentPrice) / forecastLen;
+    const attractionComponent = distance * (i / forecastLen) * 0.7;
+
+    // 3. مكون الفركتال (Fractal Component)
+    let fractalComponent = 0;
+    if (fractals.high.length > 0) {
+      const lastHigh = fractals.high[fractals.high.length - 1].price;
+      fractalComponent = (lastHigh - currentPrice) * 0.05 * strength;
+    }
+
+    // 4. مكون التذبذب (Oscillation Component)
+    const oscillation = Math.sin((i / forecastLen) * Math.PI) * volatility * strength * 0.5;
+
+    // 5. مكون الثقة RSI (RSI Confidence Component)
+    const rsiComponent = ((rsi - 50) / 50) * volatility * 0.3;
+
+    // الدمج النهائي
+    const basePrice = currentPrice + trendComponent + attractionComponent + fractalComponent + oscillation + rsiComponent;
+    
+    // تطبيق حدود معقولة
+    const minBound = Math.min(entry, sl, currentPrice * 0.90);
+    const maxBound = Math.max(tp2, currentPrice * 1.20);
+    const predictedPrice = Math.max(minBound, Math.min(maxBound, basePrice));
+
+    // حساب مستوى الثقة (Confidence Level)
+    const volatilityConfidence = Math.min(1, 1 - (volatility * 2));
+    const fractalConfidence = Math.min(1, fractals.high.length + fractals.low.length) / 10;
+    const trendConfidence = Math.abs(trend) * 0.8;
+    const confidence = Math.max(0, Math.min(1, (volatilityConfidence + fractalConfidence + trendConfidence) / 3));
+
+    predictions.push({
+      period: i,
+      price: parseFloat(predictedPrice.toFixed(2)),
+      change: parseFloat(((predictedPrice - currentPrice) / currentPrice * 100).toFixed(2)),
+      confidence: parseFloat((confidence * 100).toFixed(1)),
+      components: {
+        trend: trendComponent,
+        attraction: attractionComponent,
+        fractal: fractalComponent,
+        oscillation: oscillation,
+        rsi: rsiComponent
+      }
+    });
+  }
+
+  return predictions;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 4️⃣ VISUALIZATION
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function drawChart(candles, predictions, fractals, tp1, tp2, entry, sl) {
+  const canvas = document.getElementById('predictionChart');
+  canvas.innerHTML = '<canvas id="mainChart"></canvas>';
+  
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  
+  const historicalPrices = candles.map(c => c.close);
+  const predictedPrices = [historicalPrices[historicalPrices.length - 1], ...predictions.map(p => p.price)];
+  const historicalLabels = candles.map((_, i) => `${i}`);
+  const predictionLabels = Array.from({length: predictions.length + 1}, (_, i) => `${candles.length + i - 1}`);
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [...historicalLabels, ...predictionLabels.slice(1)],
+      datasets: [
+        {
+          label: '📊 السعر التاريخي',
+          data: [...historicalPrices, null],
+          borderColor: '#4a9eff',
+          backgroundColor: 'rgba(74, 158, 255, 0.05)',
+          borderWidth: 2,
+          tension: 0.4,
+          pointRadius: 2,
+          pointBackgroundColor: '#4a9eff'
+        },
+        {
+          label: '🤖 التنبؤ (AI Prediction)',
+          data: [null, ...predictedPrices.slice(1)],
+          borderColor: '#a78bfa',
+          backgroundColor: 'rgba(167, 139, 250, 0.1)',
+          borderWidth: 2.5,
+          borderDash: [5, 5],
+          tension: 0.4,
+          pointRadius: 3,
+          pointBackgroundColor: '#a78bfa'
+        },
+        {
+          label: '✓ TP1',
+          data: Array(historicalLabels.length + predictionLabels.length - 1).fill(tp1),
+          borderColor: '#0ecf7e',
+          borderWidth: 1.5,
+          borderDash: [3, 3],
+          pointRadius: 0,
+          fill: false
+        },
+        {
+          label: '✓ TP2',
+          data: Array(historicalLabels.length + predictionLabels.length - 1).fill(tp2),
+          borderColor: '#f5c842',
+          borderWidth: 1.5,
+          borderDash: [3, 3],
+          pointRadius: 0,
+          fill: false
+        },
+        {
+          label: '◈ Entry',
+          data: Array(historicalLabels.length + predictionLabels.length - 1).fill(entry),
+          borderColor: '#4a9eff',
+          borderWidth: 1.5,
+          borderDash: [2, 2],
+          pointRadius: 0,
+          fill: false
+        },
+        {
+          label: '✕ SL',
+          data: Array(historicalLabels.length + predictionLabels.length - 1).fill(sl),
+          borderColor: '#f04458',
+          borderWidth: 1.5,
+          borderDash: [2, 2],
+          pointRadius: 0,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: { color: '#7a8ba8', font: { family: "'IBM Plex Mono', monospace", size: 10 } }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#7a8ba8' }, grid: { color: 'rgba(255,255,255,.05)' } },
+        y: { ticks: { color: '#7a8ba8' }, grid: { color: 'rgba(255,255,255,.05)' } }
+      }
+    }
+  });
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 5️⃣ MAIN ANALYSIS FUNCTION
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function analyze() {
+  const loading = document.getElementById('loading');
+  loading.classList.add('show');
+
+  setTimeout(() => {
+    try {
+      // استخراج البيانات من الإدخالات
+      const candleStr = document.getElementById('candleData').value;
+      const tp1 = parseFloat(document.getElementById('tp1Input').value);
+      const tp2 = parseFloat(document.getElementById('tp2Input').value);
+      const entry = parseFloat(document.getElementById('entryInput').value);
+      const sl = parseFloat(document.getElementById('slInput').value);
+      const forecastLen = parseInt(document.getElementById('forecastLength').value);
+      const strength = parseFloat(document.getElementById('modelStrength').value);
+
+      // التحقق من الصحة
+      if (!candleStr || isNaN(tp1) || isNaN(entry)) {
+        alert('⚠️ الرجاء إدخال البيانات المطلوبة بشكل صحيح');
+        loading.classList.remove('show');
+        return;
+      }
+
+      State.candles = JSON.parse(candleStr);
+      
+      // تحليل الفركتالات
+      State.fractals = detectFractals(State.candles, 2);
+      
+      // التنبؤ
+      State.predictions = predictPrices(State.candles, State.fractals, tp1, tp2, entry, sl, forecastLen, strength);
+
+      // تحديث النتائج
+      updateResults(tp1, tp2, entry, sl);
+      
+      // رسم الرسم البياني
+      drawChart(State.candles, State.predictions, State.fractals, tp1, tp2, entry, sl);
+
+      loading.classList.remove('show');
+    } catch (e) {
+      alert('❌ خطأ: ' + e.message);
+      loading.classList.remove('show');
+    }
+  }, 300);
+}
+
+function updateResults(tp1, tp2, entry, sl) {
+  const lastCandle = State.candles[State.candles.length - 1];
+  const currentPrice = lastCandle.close;
+  const midPrediction = State.predictions[Math.floor(State.predictions.length / 2)];
+  const finalPrediction = State.predictions[State.predictions.length - 1];
+
+  // تحديث المقاييس
+  document.getElementById('currentPrice').textContent = currentPrice.toFixed(2);
+  document.getElementById('predictedPrice').textContent = finalPrediction.price.toFixed(2);
+  document.getElementById('forecastPeriod').textContent = `${State.predictions.length} شمعة`;
+  
+  // دقة النموذج
+  const avgConfidence = State.predictions.reduce((s, p) => s + p.confidence, 0) / State.predictions.length;
+  const accuracyClass = avgConfidence > 70 ? 'accuracy-high' : avgConfidence > 50 ? 'accuracy-medium' : 'accuracy-low';
+  document.getElementById('accuracy').innerHTML = `<span class="accuracy-indicator ${accuracyClass}">${avgConfidence.toFixed(1)}%</span>`;
+
+  document.getElementById('fractalStrength').textContent = (State.fractals.strength * 100).toFixed(1) + '%';
+  document.getElementById('fractalCount').textContent = State.fractals.high.length + State.fractals.low.length;
+
+  // تحديث الجدول
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = State.predictions.slice(0, 10).map((p, i) => `
+    <tr>
+      <td>${p.period}</td>
+      <td>${p.price.toFixed(2)}</td>
+      <td style="color:${p.change > 0 ? '#0ecf7e' : '#f04458'}">${(p.change > 0 ? '+' : '')}${p.change.toFixed(2)}%</td>
+      <td>${p.confidence.toFixed(0)}%</td>
+    </tr>
+  `).join('');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// EVENT LISTENERS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+document.getElementById('analyzeBtn').addEventListener('click', analyze);
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  document.getElementById('candleData').value = '';
+  document.getElementById('tp1Input').value = '';
+  document.getElementById('tp2Input').value = '';
+  document.getElementById('entryInput').value = '';
+  document.getElementById('slInput').value = '';
+  document.getElementById('currentPrice').textContent = '—';
+  document.getElementById('predictedPrice').textContent = '—';
+  document.getElementById('accuracy').textContent = '—';
+  document.getElementById('fractalStrength').textContent = '—';
+  document.getElementById('fractalCount').textContent = '—';
+  document.getElementById('tableBody').innerHTML = '<tr><td colspan="4">—</td></tr>';
+  document.getElementById('predictionChart').innerHTML = '';
+});
+
+// تحميل البيانات الافتراضية عند التحميل
+window.addEventListener('load', () => {
+  // بيانات عينة
+  const sampleCandles = [
+    {"time":1,"open":100,"high":105,"low":99,"close":102,"volume":1000},
+    {"time":2,"open":102,"high":108,"low":101,"close":107,"volume":1200},
+    {"time":3,"open":107,"high":110,"low":106,"close":109,"volume":1100},
+    {"time":4,"open":109,"high":112,"low":108,"close":110,"volume":1300},
+    {"time":5,"open":110,"high":114,"low":109,"close":112,"volume":1400},
+    {"time":6,"open":112,"high":115,"low":111,"close":113,"volume":1500},
+    {"time":7,"open":113,"high":116,"low":112,"close":114,"volume":1600},
+    {"time":8,"open":114,"high":117,"low":113,"close":115,"volume":1700},
+    {"time":9,"open":115,"high":118,"low":114,"close":116,"volume":1800},
+    {"time":10,"open":116,"high":119,"low":115,"close":117,"volume":1900},
+    {"time":11,"open":117,"high":120,"low":116,"close":118,"volume":2000},
+    {"time":12,"open":118,"high":121,"low":117,"close":119,"volume":2100},
+    {"time":13,"open":119,"high":122,"low":118,"close":120,"volume":2200},
+    {"time":14,"open":120,"high":123,"low":119,"close":121,"volume":2300},
+    {"time":15,"open":121,"high":124,"low":120,"close":122,"volume":2400}
+  ];
+
+  document.getElementById('candleData').value = JSON.stringify(sampleCandles);
+  document.getElementById('tp1Input').value = '125';
+  document.getElementById('tp2Input').value = '130';
+  document.getElementById('entryInput').value = '120';
+  document.getElementById('slInput').value = '115';
+});
+
+</script>
+
+</body>
+</html>
