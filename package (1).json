@@ -1,0 +1,49 @@
+{
+  "name": "tadawul-filters-pro-ai",
+  "version": "1.0.0",
+  "description": "منصة متقدمة للتحليل الفني مع نموذج التنبؤ الفركتالي بالذكاء الاصطناعي | Advanced Trading Analysis Platform with Fractal AI Prediction",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "dev": "npx http-server -p 3000 -c-1",
+    "start": "npx http-server -p 3000 -c-1",
+    "serve": "npx http-server --port 8080",
+    "build": "echo 'Static site ready'",
+    "preview": "npm start"
+  },
+  "keywords": [
+    "trading",
+    "technical-analysis",
+    "fractal",
+    "ai",
+    "prediction",
+    "tadawul",
+    "saudi-stock",
+    "machine-learning",
+    "forecasting",
+    "تداول",
+    "التحليل الفني",
+    "الفركتالات",
+    "الذكاء الاصطناعي",
+    "التنبؤ"
+  ],
+  "author": "TADAWUL AI Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/tadawul-filters-pro-ai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/tadawul-filters-pro-ai/issues"
+  },
+  "homepage": "https://tadawul-filters.vercel.app",
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "optionalDependencies": {}
+}

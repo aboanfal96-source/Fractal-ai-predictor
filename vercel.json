@@ -1,0 +1,40 @@
+{
+  "name": "TADAWUL FILTERS PRO AI",
+  "version": "1.0.0",
+  "description": "منصة متقدمة للتحليل الفني مع نموذج التنبؤ الفركتالي بالذكاء الاصطناعي",
+  "buildCommand": "echo 'No build needed'",
+  "outputDirectory": "public",
+  "framework": "static",
+  "functions": {
+    "api/predict.js": {
+      "memory": 256,
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/index.html",
+      "permanent": false
+    }
+  ]
+}

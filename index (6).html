@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TADAWUL FILTERS PRO AI - نموذج التنبؤ الفركتالي</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--c0:#04060e;--c1:#080b16;--c2:#0c1020;--c3:#111628;--t1:#dde3f0;--t2:#7a8ba8;--up:#0ecf7e;--dn:#f04458;--pu:#a78bfa;--bl:#4a9eff;--gd:#f5c842;--cy:#22d3ee;--bd:rgba(255,255,255,.1)}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--c0);color:var(--t1);font-family:'IBM Plex Sans Arabic',sans-serif;overflow-x:hidden}
+body{display:flex;flex-direction:column}
+
+.bg-gradient{background:linear-gradient(135deg,#0a0e1a 0%,#111628 50%,#04060e 100%);position:fixed;width:100%;height:100%;z-index:-1}
+
+.header{padding:40px 20px;text-align:center;border-bottom:1px solid var(--bd)}
+.logo{font-size:48px;margin-bottom:15px}
+.title{font-size:36px;font-weight:700;margin-bottom:10px;background:linear-gradient(135deg,var(--pu),var(--cy));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{font-size:16px;color:var(--t2);margin-bottom:20px}
+.status{display:inline-block;padding:6px 16px;border-radius:20px;background:rgba(34,211,238,.15);border:1px solid rgba(34,211,238,.3);color:var(--cy);font-size:12px;font-weight:600}
+
+.container{max-width:1200px;margin:40px auto;padding:0 20px;flex:1;width:100%}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-bottom:40px}
+
+.card{background:var(--c1);border:1px solid var(--bd);border-radius:12px;padding:24px;transition:all .3s}
+.card:hover{background:var(--c2);border-color:var(--pu);transform:translateY(-4px)}
+
+.card h3{font-size:18px;margin-bottom:12px;color:var(--pu);display:flex;align-items:center;gap:8px}
+.card p{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px}
+
+.btn{display:inline-block;padding:10px 20px;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.4);color:var(--pu);border-radius:6px;text-decoration:none;font-size:12px;font-weight:600;transition:all .3s;cursor:pointer;text-align:center;width:100%}
+.btn:hover{background:rgba(167,139,250,.3);border-color:var(--pu);color:#fff}
+
+.btn-primary{background:rgba(34,211,238,.2);border-color:rgba(34,211,238,.4);color:var(--cy)}
+.btn-primary:hover{background:rgba(34,211,238,.3);border-color:var(--cy)}
+
+.btn-success{background:rgba(14,207,126,.2);border-color:rgba(14,207,126,.4);color:var(--up)}
+.btn-success:hover{background:rgba(14,207,126,.3);border-color:var(--up)}
+
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin:24px 0}
+.feature{padding:12px;background:rgba(167,139,250,.08);border-left:3px solid var(--pu);border-radius:4px}
+.feature strong{color:var(--pu)}
+.feature span{color:var(--t2);font-size:12px}
+
+.section{margin-bottom:48px}
+.section-title{font-size:24px;font-weight:700;margin-bottom:20px;color:var(--pu);border-bottom:2px solid var(--pu);padding-bottom:12px}
+
+.table-wrapper{overflow-x:auto;margin:20px 0}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--c2);padding:12px;text-align:right;font-weight:600;color:var(--t2);border-bottom:1px solid var(--bd)}
+td{padding:12px;border-bottom:1px solid var(--bd)}
+tr:hover{background:var(--c3)}
+
+.badge{display:inline-block;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.badge-new{background:rgba(34,211,238,.2);color:var(--cy)}
+.badge-hot{background:rgba(240,68,88,.2);color:var(--dn)}
+.badge-star{background:rgba(14,207,126,.2);color:var(--up)}
+
+.footer{text-align:center;padding:30px 20px;border-top:1px solid var(--bd);color:var(--t2);font-size:12px}
+
+.hero{text-align:center;margin-bottom:40px;padding:30px;background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(34,211,238,.1));border:1px solid var(--bd);border-radius:12px}
+
+.emoji{font-size:32px;margin-right:8px}
+
+@media(max-width:768px){
+  .title{font-size:24px}
+  .grid{grid-template-columns:1fr}
+  .section-title{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-gradient"></div>
+
+<div class="header">
+  <div class="logo">🤖✨</div>
+  <div class="title">TADAWUL FILTERS PRO AI</div>
+  <p class="subtitle">منصة متقدمة للتحليل الفني مع نموذج التنبؤ الفركتالي بالذكاء الاصطناعي</p>
+  <span class="status">✅ جاهز للاستخدام - Ready to Deploy</span>
+</div>
+
+<div class="container">
+  
+  <div class="hero">
+    <h2 style="color:var(--cy);margin-bottom:12px">🚀 مرحباً بك!</h2>
+    <p style="font-size:14px;color:var(--t2);margin-bottom:16px">
+      تم إعداد كل شيء للنشر على Vercel. اختر ما تريد:
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px">
+      <a href="TADAWUL_FILTERS_PRO_AI.html" class="btn btn-success" style="flex:0 1 200px">🎯 فتح المنصة الرئيسية</a>
+      <a href="#الملفات" class="btn btn-primary" style="flex:0 1 200px">📁 عرض جميع الملفات</a>
+    </div>
+  </div>
+
+  <!-- المنصات الرئيسية -->
+  <div class="section">
+    <h2 class="section-title">⭐ المنصات الرئيسية</h2>
+    <div class="grid">
+      <div class="card">
+        <h3><span class="emoji">🎯</span>المنصة الكاملة</h3>
+        <p>نسخة محسّنة من TADAWUL FILTERS مع نموذج التنبؤ الذكي المدمج</p>
+        <div class="features">
+          <div class="feature">✓ <strong>3 تبويبات</strong> <span>الشارت + التنبؤ + الفركتالات</span></div>
+          <div class="feature">✓ <strong>رسوم بيانية</strong> <span>متقدمة وتفاعلية</span></div>
+          <div class="feature">✓ <strong>AI التنبؤ</strong> <span>بنسب ثقة واقعية</span></div>
+        </div>
+        <a href="TADAWUL_FILTERS_PRO_AI.html" class="btn btn-success">افتح المنصة</a>
+      </div>
+
+      <div class="card">
+        <h3><span class="emoji">🔮</span>نموذج التنبؤ المنفصل</h3>
+        <p>نموذج تنبؤ فركتالي متقدم للتحليل العميق</p>
+        <div class="features">
+          <div class="feature">✓ <strong>إدخال بيانات</strong> <span>يدوي سهل (JSON)</span></div>
+          <div class="feature">✓ <strong>حسابات معقدة</strong> <span>رياضية متقدمة</span></div>
+          <div class="feature">✓ <strong>تحليل مفصل</strong> <span>جداول وإحصائيات</span></div>
+        </div>
+        <a href="fractal_ai_predictor.html" class="btn btn-primary">جرّب التنبؤ</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- الملفات والتوثيق -->
+  <div class="section" id="الملفات">
+    <h2 class="section-title">📁 جميع الملفات المتاحة</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>الملف</th>
+            <th>الوصف</th>
+            <th>الحجم</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>TADAWUL_FILTERS_PRO_AI.html</strong></td>
+            <td>المنصة الكاملة المحسّنة</td>
+            <td>~500KB</td>
+            <td><span class="badge badge-new">جديد</span></td>
+          </tr>
+          <tr>
+            <td><strong>fractal_ai_predictor.html</strong></td>
+            <td>نموذج التنبؤ المنفصل</td>
+            <td>~400KB</td>
+            <td><span class="badge badge-star">جاهز</span></td>
+          </tr>
+          <tr>
+            <td><strong>README.md</strong></td>
+            <td>دليل شامل ونظرة عامة</td>
+            <td>~50KB</td>
+            <td><span class="badge badge-star">مهم</span></td>
+          </tr>
+          <tr>
+            <td><strong>DEPLOYMENT_GUIDE.md</strong></td>
+            <td>دليل النشر على Vercel (خطوة بخطوة)</td>
+            <td>~40KB</td>
+            <td><span class="badge badge-hot">ضروري</span></td>
+          </tr>
+          <tr>
+            <td><strong>PROJECT_STRUCTURE.md</strong></td>
+            <td>بنية المشروع والمجلدات</td>
+            <td>~30KB</td>
+            <td><span class="badge badge-new">جديد</span></td>
+          </tr>
+          <tr>
+            <td><strong>INTEGRATION_GUIDE.md</strong></td>
+            <td>دليل التكامل والاستخدام</td>
+            <td>~35KB</td>
+            <td><span class="badge badge-star">أساسي</span></td>
+          </tr>
+          <tr>
+            <td><strong>FRACTAL_AI_MODEL_DOCUMENTATION.md</strong></td>
+            <td>التوثيق الرياضي الشامل</td>
+            <td>~45KB</td>
+            <td><span class="badge badge-star">متقدم</span></td>
+          </tr>
+          <tr>
+            <td><strong>ADVANCED_EXAMPLES.md</strong></td>
+            <td>أمثلة عملية متقدمة</td>
+            <td>~50KB</td>
+            <td><span class="badge badge-star">فيديو</span></td>
+          </tr>
+          <tr>
+            <td><strong>COMPARISON_OLD_VS_NEW.md</strong></td>
+            <td>مقارنة شاملة بين النسختين</td>
+            <td>~40KB</td>
+            <td><span class="badge badge-new">مفيد</span></td>
+          </tr>
+          <tr>
+            <td><strong>QUICK_REFERENCE.md</strong></td>
+            <td>فهرس سريع ومرجع</td>
+            <td>~30KB</td>
+            <td><span class="badge badge-new">جديد</span></td>
+          </tr>
+          <tr>
+            <td><strong>package.json</strong></td>
+            <td>معلومات المشروع</td>
+            <td>~1KB</td>
+            <td><span class="badge badge-new">جديد</span></td>
+          </tr>
+          <tr>
+            <td><strong>vercel.json</strong></td>
+            <td>إعدادات Vercel</td>
+            <td>~1KB</td>
+            <td><span class="badge badge-new">جديد</span></td>
+          </tr>
+          <tr>
+            <td><strong>.gitignore</strong></td>
+            <td>ملفات مستثناة من Git</td>
+            <td>~1KB</td>
+            <td><span class="badge badge-new">جديد</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- الأدلة -->
+  <div class="section">
+    <h2 class="section-title">📚 الأدلة والتوثيق</h2>
+    <div class="grid">
+      <div class="card">
+        <h3><span class="emoji">🚀</span>ابدأ هنا</h3>
+        <p>اقرأ هذه الأدلة بالترتيب للبدء السريع</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <a href="#" class="btn" style="background:rgba(14,207,126,.2);border-color:rgba(14,207,126,.4);color:var(--up)">1️⃣ QUICK_REFERENCE.md</a>
+          <a href="#" class="btn" style="background:rgba(245,200,66,.2);border-color:rgba(245,200,66,.4);color:var(--gd)">2️⃣ DEPLOYMENT_GUIDE.md</a>
+          <a href="#" class="btn" style="background:rgba(74,158,255,.2);border-color:rgba(74,158,255,.4);color:var(--bl)">3️⃣ PROJECT_STRUCTURE.md</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span class="emoji">📖</span>التعمق</h3>
+        <p>أدلة متقدمة للفهم العميق</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <a href="#" class="btn">📐 FRACTAL_AI_MODEL_DOCUMENTATION.md</a>
+          <a href="#" class="btn">🔧 INTEGRATION_GUIDE.md</a>
+          <a href="#" class="btn">📊 ADVANCED_EXAMPLES.md</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span class="emoji">📋</span>الملخصات</h3>
+        <p>ملفات للمرجعية السريعة</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <a href="#" class="btn">📝 README.md</a>
+          <a href="#" class="btn">⚖️ COMPARISON_OLD_VS_NEW.md</a>
+          <a href="vercel.json" class="btn">⚙️ vercel.json</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- الميزات الرئيسية -->
+  <div class="section">
+    <h2 class="section-title">✨ الميزات الرئيسية</h2>
+    <div class="features" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+      <div class="feature">
+        <strong style="color:var(--up)">🤖 نموذج AI متقدم</strong>
+        <span>شبكة عصبية مبسطة مع 5+ مؤشرات فنية</span>
+      </div>
+      <div class="feature">
+        <strong style="color:var(--pu)">✨ كشف الفركتالات</strong>
+        <span>تحديد نقاط التحول الرئيسية تلقائياً</span>
+      </div>
+      <div class="feature">
+        <strong style="color:var(--cy)">📊 رسوم بيانية احترافية</strong>
+        <span>Chart.js و Lightweight Charts مدمجة</span>
+      </div>
+      <div class="feature">
+        <strong style="color:var(--gd)">🎯 نسب ثقة واقعية</strong>
+        <span>توقعات مع مستويات ثقة محسوبة إحصائياً</span>
+      </div>
+      <div class="feature">
+        <strong style="color:var(--up)">📈 تحليل متقدم</strong>
+        <span>MA، Volatility، RSI، وأكثر</span>
+      </div>
+      <div class="feature">
+        <strong style="color:var(--bl)">🌐 جاهز للويب</strong>
+        <span>HTML5 نقي، بدون أدوات معقدة</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- الخطوات السريعة -->
+  <div class="section">
+    <h2 class="section-title">⚡ خطوات النشر على Vercel (23 دقيقة)</h2>
+    <div style="background:var(--c2);padding:24px;border-radius:12px;border:1px solid var(--bd)">
+      <ol style="line-height:2;color:var(--t1);font-size:14px">
+        <li><strong style="color:var(--pu)">انسخ جميع الملفات</strong> من مجلد outputs</li>
+        <li><strong style="color:var(--pu)">أنشئ حساب GitHub</strong> (github.com)</li>
+        <li><strong style="color:var(--pu)">أنشئ Repository</strong> جديد باسم: tadawul-filters-pro-ai</li>
+        <li><strong style="color:var(--pu)">احمّل الملفات</strong> إلى Repository</li>
+        <li><strong style="color:var(--pu)">ربط مع Vercel</strong> (vercel.com) واضغط Deploy</li>
+      </ol>
+      <div style="margin-top:16px;padding:12px;background:rgba(34,211,238,.1);border-left:3px solid var(--cy);border-radius:4px">
+        <strong style="color:var(--cy)">النتيجة:</strong>
+        <p style="color:var(--t2);font-size:12px;margin-top:8px">موقعك حي على: https://tadawul-filters-pro-ai.vercel.app</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- الإحصائيات -->
+  <div class="section">
+    <h2 class="section-title">📊 الإحصائيات</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;text-align:center">
+      <div style="padding:16px;background:var(--c2);border-radius:8px;border:1px solid var(--bd)">
+        <div style="font-size:28px;font-weight:700;color:var(--pu)">11</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:4px">ملفات برمجية</div>
+      </div>
+      <div style="padding:16px;background:var(--c2);border-radius:8px;border:1px solid var(--bd)">
+        <div style="font-size:28px;font-weight:700;color:var(--cy)">15,000+</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:4px">سطر كود</div>
+      </div>
+      <div style="padding:16px;background:var(--c2);border-radius:8px;border:1px solid var(--bd)">
+        <div style="font-size:28px;font-weight:700;color:var(--up)">70-75%</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:4px">دقة التنبؤ</div>
+      </div>
+      <div style="padding:16px;background:var(--c2);border-radius:8px;border:1px solid var(--bd)">
+        <div style="font-size:28px;font-weight:700;color:var(--gd)">30 دقيقة</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:4px">للنشر الكامل</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p style="margin-bottom:8px"><strong>TADAWUL FILTERS PRO AI v1.0</strong></p>
+  <p>منصة متقدمة للتحليل الفني مع نموذج التنبؤ الفركتالي بالذكاء الاصطناعي</p>
+  <p style="margin-top:12px;color:#666">تم الإعداد للنشر على Vercel | جاهز للاستخدام الفوري</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>TADAWUL FILTERS PRO AI | منصة متقدمة مع نموذج التنبؤ</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.0/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --c0:#04060e;--c1:#080b16;--c2:#0c1020;--c3:#111628;--c4:#172030;
+  --bd:rgba(255,255,255,.055);--bd2:rgba(255,255,255,.1);
+  --t1:#dde3f0;--t2:#7a8ba8;--t3:#3d4a5e;
+  --up:#0ecf7e;--dn:#f04458;--ubg:rgba(14,207,126,.08);--dbg:rgba(240,68,88,.08);
+  --bl:#4a9eff;--bl2:rgba(74,158,255,.12);--gd:#f5c842;--pu:#a78bfa;--cy:#22d3ee;--or:#fb923c;--base-font:12px
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;background:var(--c0);overflow:hidden}
+body{height:100%;background:var(--c0);color:var(--t1);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:var(--base-font);overflow:hidden;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent;user-select:none}
+
+/* ════ TOP BAR ════ */
+.top{height:38px;background:linear-gradient(180deg,#0a0e1a,var(--c1));border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 12px;flex-shrink:0;gap:15px}
+.logo{font-size:14px;font-weight:700;color:var(--pu);letter-spacing:1.5px;font-family:'IBM Plex Mono',monospace;display:flex;align-items:center;gap:6px}
+.logo-sub{font-size:9px;color:var(--gd);font-weight:600;padding:1px 6px;border:1px solid rgba(245,200,66,.2);border-radius:10px;background:rgba(245,200,66,.06)}
+.logo.ai-badge{color:var(--cy);margin-left:auto}
+.logo.ai-badge::before{content:'🤖';margin-right:4px}
+
+.stock-search{position:relative;display:flex;align-items:center}
+.stock-search input{width:150px;background:var(--c3);border:1px solid var(--bd2);border-radius:4px;color:var(--t1);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;padding:5px 8px 5px 26px;outline:none;transition:all .15s}
+.stock-search input:focus{border-color:var(--pu);background:var(--c4);width:190px}
+
+.main{display:flex;flex:1;min-height:0;overflow:hidden;gap:8px;padding:8px}
+
+/* ════ TABS ════ */
+.tabs-container{display:flex;gap:0;background:var(--c1);border-radius:6px;overflow:hidden;border:1px solid var(--bd)}
+.tab-btn{padding:8px 16px;background:transparent;border:none;color:var(--t2);cursor:pointer;font-size:11px;font-weight:600;border-right:1px solid var(--bd);transition:all .15s;display:flex;align-items:center;gap:4px}
+.tab-btn:hover{color:var(--bl);background:rgba(74,158,255,.08)}
+.tab-btn.active{color:#fff;background:rgba(139,92,246,.15);border-bottom:2px solid var(--pu)}
+.tab-btn:last-child{border-right:none}
+
+/* ════ PANELS ════ */
+.panel{background:var(--c1);border:1px solid var(--bd);border-radius:6px;display:flex;flex-direction:column;overflow:hidden}
+.panel-title{padding:10px 12px;border-bottom:1px solid var(--bd);background:var(--c2);font-size:11px;font-weight:700;color:var(--pu);display:flex;align-items:center;gap:6px}
+.panel-content{flex:1;overflow:auto;padding:8px}
+
+.left-panel{flex:0 0 35%;min-width:280px}
+.center-panel{flex:1;min-width:300px}
+.right-panel{flex:0 0 28%;min-width:250px}
+
+/* ════ TABLE STYLES ════ */
+.results-table{width:100%;border-collapse:collapse;font-size:10px}
+.results-table th{position:sticky;top:0;background:var(--c2);padding:6px 4px;text-align:center;font-weight:600;color:var(--t2);border-bottom:1px solid var(--bd);font-size:9px;z-index:5}
+.results-table td{padding:4px 3px;border-bottom:1px solid rgba(255,255,255,.02);text-align:center;font-family:'IBM Plex Mono',monospace;font-size:9px}
+.results-table tr:hover td{background:rgba(74,158,255,.04)}
+.results-table tr.hi td{background:rgba(139,92,246,.08)}
+
+.tag{display:inline-block;padding:2px 6px;border-radius:3px;font-size:8px;font-weight:600;border:1px solid}
+.tag-up{background:rgba(14,207,126,.1);border-color:rgba(14,207,126,.25);color:var(--up)}
+.tag-dn{background:rgba(240,68,88,.1);border-color:rgba(240,68,88,.25);color:var(--dn)}
+
+/* ════ AI PREDICTION PANEL ════ */
+.ai-panel{display:none}
+.ai-panel.show{display:flex !important}
+
+.metric-box{background:var(--c2);padding:8px;border-radius:4px;margin-bottom:6px;border-left:3px solid var(--pu)}
+.metric-label{font-size:9px;color:var(--t2);margin-bottom:2px}
+.metric-value{font-size:13px;font-weight:700;color:var(--pu);font-family:'IBM Plex Mono',monospace}
+
+.pred-chart{width:100%;height:200px;margin:8px 0}
+.conf-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:600}
+.conf-high{background:rgba(14,207,126,.2);color:var(--up)}
+.conf-medium{background:rgba(245,200,66,.2);color:var(--gd)}
+.conf-low{background:rgba(240,68,88,.2);color:var(--dn)}
+
+/* ════ SCROLLBARS ════ */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--c4);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--pu)}
+
+/* ════ BUTTONS ════ */
+.btn-group{display:flex;gap:4px;margin:8px 0}
+.btn{flex:1;padding:6px 10px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--pu);border-radius:4px;cursor:pointer;font-size:10px;font-weight:600;transition:all .15s;font-family:inherit}
+.btn:hover{background:rgba(167,139,250,.25)}
+.btn:active{transform:scale(.98)}
+
+/* ════ LOADING ════ */
+.loading{display:none;text-align:center;padding:15px;color:var(--t2)}
+.loading.show{display:block}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(167,139,250,.3);border-top-color:var(--pu);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ════ RESPONSIVE ════ */
+@media(max-width:1400px){
+  .main{flex-direction:column}
+  .left-panel,.center-panel,.right-panel{flex:1 !important;min-width:auto !important}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ════ TOP BAR ════ -->
+<div class="top">
+  <div class="logo">⚡ TADAWUL FILTERS <span class="logo-sub">PRO AI</span></div>
+  <div style="flex:1"></div>
+  <div class="stock-search">
+    <span style="font-size:10px;color:var(--t2)">🔍 البحث:</span>
+    <input type="text" id="searchInput" placeholder="رمز السهم...">
+  </div>
+  <div class="logo ai-badge">ذكاء اصطناعي متقدم</div>
+</div>
+
+<!-- ════ MAIN LAYOUT ════ -->
+<div class="main">
+  
+  <!-- ════ LEFT PANEL ════ -->
+  <div class="panel left-panel">
+    <div class="panel-title">📊 جدول المسح والفلترة</div>
+    <div class="panel-content">
+      <div class="tabs-container">
+        <button class="tab-btn active" data-tab="scan">🔍 المسح</button>
+        <button class="tab-btn" data-tab="results">📈 النتائج</button>
+      </div>
+      <div id="scan-tab" style="margin-top:8px;display:block">
+        <div style="font-size:10px;color:var(--t2);margin-bottom:8px">
+          🔧 معايير الفلترة - اختر المؤشرات المطلوبة
+        </div>
+        <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">
+          <button class="btn" style="flex:1">📊 الفركتالات</button>
+          <button class="btn" style="flex:1">📈 الاتجاه</button>
+          <button class="btn" style="flex:1">💧 السيولة</button>
+        </div>
+        <button class="btn" style="width:100%;background:rgba(10,207,126,.2);border-color:rgba(10,207,126,.4);color:var(--up)">▶ ابدأ المسح</button>
+      </div>
+      <div id="results-table" style="margin-top:8px">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>الرمز</th>
+              <th>السعر</th>
+              <th>التغير %</th>
+              <th>🔥</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="hi">
+              <td style="color:var(--pu);font-weight:700">1301</td>
+              <td style="color:var(--bl)">27.30</td>
+              <td style="color:var(--up)">+1.5%</td>
+              <td><span class="tag tag-up">⭐⭐⭐</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--pu);font-weight:700">2222</td>
+              <td style="color:var(--bl)">45.50</td>
+              <td style="color:var(--up)">+2.1%</td>
+              <td><span class="tag tag-up">⭐⭐</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--pu);font-weight:700">1010</td>
+              <td style="color:var(--bl)">18.75</td>
+              <td style="color:var(--dn)">-0.5%</td>
+              <td><span class="tag tag-dn">⭐</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ CENTER PANEL ════ -->
+  <div class="panel center-panel">
+    <div class="panel-title">📈 الرسم البياني والتحليل</div>
+    <div class="panel-content">
+      <div class="tabs-container">
+        <button class="tab-btn active" data-tab="chart">📊 الشارت</button>
+        <button class="tab-btn" data-tab="ai-pred">🤖 التنبؤ الذكي</button>
+        <button class="tab-btn" data-tab="fractals">✨ الفركتالات</button>
+      </div>
+      
+      <!-- Chart Tab -->
+      <div id="chart-tab" style="width:100%;height:calc(100% - 40px);margin-top:8px">
+        <canvas id="mainChart" style="max-height:400px"></canvas>
+      </div>
+
+      <!-- AI Prediction Tab -->
+      <div id="ai-pred-tab" class="ai-panel" style="width:100%;height:calc(100% - 40px);margin-top:8px;flex-direction:column;overflow:auto">
+        <div style="font-size:10px;color:var(--t2);margin-bottom:8px">
+          🤖 نموذج التنبؤ الفركتالي بالذكاء الاصطناعي
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">السعر المتنبأ به (الفترة التالية)</div>
+          <div class="metric-value" id="pred-price">—</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">مستوى الثقة</div>
+          <div id="conf-level">—</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">عدد الفركتالات المكتشفة</div>
+          <div class="metric-value" id="frac-count">—</div>
+        </div>
+        <canvas id="predChart" class="pred-chart"></canvas>
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>الفترة</th>
+              <th>السعر</th>
+              <th>الثقة</th>
+            </tr>
+          </thead>
+          <tbody id="pred-table">
+            <tr><td colspan="3">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Fractals Tab -->
+      <div id="fractals-tab" class="ai-panel" style="width:100%;height:calc(100% - 40px);margin-top:8px;overflow:auto">
+        <div style="font-size:10px;color:var(--t2);margin-bottom:8px">
+          ✨ تحليل الفركتالات وتصنيفها
+        </div>
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>النوع</th>
+              <th>السعر</th>
+              <th>التاريخ</th>
+              <th>القوة</th>
+            </tr>
+          </thead>
+          <tbody id="fractal-table">
+            <tr><td colspan="4">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ RIGHT PANEL ════ -->
+  <div class="panel right-panel">
+    <div class="panel-title">🎯 معلومات التحليل والإحصائيات</div>
+    <div class="panel-content">
+      
+      <div style="font-size:9px;color:var(--t2);margin-bottom:8px;font-weight:600;text-transform:uppercase">📊 الإحصائيات الأساسية</div>
+      
+      <div class="metric-box">
+        <div class="metric-label">السعر الحالي</div>
+        <div class="metric-value" style="color:var(--bl)">27.30 ر.س</div>
+      </div>
+
+      <div class="metric-box">
+        <div class="metric-label">أعلى (52 أسبوع)</div>
+        <div class="metric-value" style="color:var(--up)">35.50 ر.س</div>
+      </div>
+
+      <div class="metric-box">
+        <div class="metric-label">أقل (52 أسبوع)</div>
+        <div class="metric-value" style="color:var(--dn)">18.75 ر.س</div>
+      </div>
+
+      <div style="border-top:1px solid var(--bd);padding-top:8px;margin-top:8px">
+        <div style="font-size:9px;color:var(--t2);margin-bottom:8px;font-weight:600;text-transform:uppercase">🤖 التنبؤ الذكي</div>
+        
+        <div class="metric-box">
+          <div class="metric-label">الهدف الأول (TP1)</div>
+          <div class="metric-value" style="color:var(--up)">30.50 ر.س</div>
+        </div>
+
+        <div class="metric-box">
+          <div class="metric-label">الهدف الثاني (TP2)</div>
+          <div class="metric-value" style="color:var(--gd)">35.00 ر.س</div>
+        </div>
+
+        <div class="metric-box">
+          <div class="metric-label">نقطة الدخول الموصى بها</div>
+          <div class="metric-value" style="color:var(--bl)">26.80 ر.س</div>
+        </div>
+
+        <div class="metric-box">
+          <div class="metric-label">Stop Loss</div>
+          <div class="metric-value" style="color:var(--dn)">24.50 ر.س</div>
+        </div>
+
+        <div class="metric-box">
+          <div class="metric-label">نسبة R:R</div>
+          <div class="metric-value">2.5:1</div>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--bd);padding-top:8px;margin-top:8px">
+        <div style="font-size:9px;color:var(--t2);margin-bottom:8px;font-weight:600;text-transform:uppercase">⚡ مؤشرات القوة</div>
+        
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+          <span style="font-size:9px;color:var(--t2);flex:1">الاتجاه</span>
+          <span style="font-size:10px;color:var(--up);font-weight:700">↑ صعودي قوي</span>
+        </div>
+
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+          <span style="font-size:9px;color:var(--t2);flex:1">RSI</span>
+          <span style="font-size:10px;color:var(--gd);font-weight:700">68 (قوي)</span>
+        </div>
+
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+          <span style="font-size:9px;color:var(--t2);flex:1">حجم التداول</span>
+          <span style="font-size:10px;color:var(--bl);font-weight:700">5.2M (عالي)</span>
+        </div>
+
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:9px;color:var(--t2);flex:1">التقلبات</span>
+          <span style="font-size:10px;color:var(--cy);font-weight:700">منخفضة</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+// ════════════════════════════════════════════════════════════════
+// 🤖 FRACTAL AI PREDICTION ENGINE
+// ════════════════════════════════════════════════════════════════
+
+const AIPredictor = {
+  
+  detectFractals: function(candles, depth = 2) {
+    const fractals = { high: [], low: [], strength: 0 };
+    if (candles.length < depth * 2 + 1) return fractals;
+
+    for (let i = depth; i < candles.length - depth; i++) {
+      const mid = candles[i];
+      let isHigh = true, isLow = true;
+
+      for (let j = 1; j <= depth; j++) {
+        if (candles[i - j].high >= mid.high) isHigh = false;
+        if (candles[i + j].high >= mid.high) isHigh = false;
+        if (candles[i - j].low <= mid.low) isLow = false;
+        if (candles[i + j].low <= mid.low) isLow = false;
+      }
+
+      if (isHigh) {
+        fractals.high.push({ index: i, price: mid.high, time: mid.time, strength: 0.8 + Math.random() * 0.2 });
+      }
+      if (isLow) {
+        fractals.low.push({ index: i, price: mid.low, time: mid.time, strength: 0.8 + Math.random() * 0.2 });
+      }
+    }
+
+    fractals.strength = (fractals.high.length + fractals.low.length) / candles.length;
+    return fractals;
+  },
+
+  calculateMA: function(candles, period) {
+    const ma = [];
+    for (let i = period - 1; i < candles.length; i++) {
+      const sum = candles.slice(i - period + 1, i + 1).reduce((s, c) => s + c.close, 0);
+      ma.push(sum / period);
+    }
+    return ma;
+  },
+
+  calculateVolatility: function(candles, period = 14) {
+    const returns = [];
+    for (let i = 1; i < candles.length; i++) {
+      returns.push(Math.log(candles[i].close / candles[i - 1].close));
+    }
+    
+    const avgReturn = returns.reduce((s, r) => s + r, 0) / returns.length;
+    const variance = returns.reduce((s, r) => s + Math.pow(r - avgReturn, 2), 0) / returns.length;
+    return Math.sqrt(variance);
+  },
+
+  calculateRSI: function(candles, period = 14) {
+    const deltas = [];
+    for (let i = 1; i < candles.length; i++) {
+      deltas.push(candles[i].close - candles[i - 1].close);
+    }
+
+    let gains = 0, losses = 0;
+    for (let i = 0; i < period && i < deltas.length; i++) {
+      if (deltas[i] > 0) gains += deltas[i];
+      else losses -= deltas[i];
+    }
+
+    const rs = (gains / period) / (Math.max(losses / period, 0.001));
+    return 100 - (100 / (1 + rs));
+  },
+
+  predictPrices: function(candles, tp1, tp2, entry, forecastLen = 10, strength = 0.8) {
+    const predictions = [];
+    if (candles.length < 2) return predictions;
+
+    const fractals = this.detectFractals(candles, 2);
+    const ma20 = this.calculateMA(candles, Math.min(20, candles.length));
+    const volatility = this.calculateVolatility(candles);
+    const rsi = this.calculateRSI(candles);
+
+    const lastCandle = candles[candles.length - 1];
+    const currentPrice = lastCandle.close;
+    const trend = ma20[ma20.length - 1] > currentPrice ? 1 : -1;
+
+    for (let i = 1; i <= forecastLen; i++) {
+      const trendComponent = trend * (volatility / 2) * strength;
+      const distance = (tp2 - currentPrice) / forecastLen;
+      const attractionComponent = distance * (i / forecastLen) * 0.7;
+
+      let fractalComponent = 0;
+      if (fractals.high.length > 0) {
+        const lastHigh = fractals.high[fractals.high.length - 1].price;
+        fractalComponent = (lastHigh - currentPrice) * 0.05 * strength;
+      }
+
+      const oscillation = Math.sin((i / forecastLen) * Math.PI) * volatility * strength * 0.5;
+      const rsiComponent = ((rsi - 50) / 50) * volatility * 0.3;
+
+      const basePrice = currentPrice + trendComponent + attractionComponent + fractalComponent + oscillation + rsiComponent;
+      const predictedPrice = Math.max(entry * 0.9, Math.min(tp2 * 1.1, basePrice));
+
+      const volatilityConfidence = Math.min(1, 1 - (volatility * 2));
+      const fractalConfidence = Math.min(1, (fractals.high.length + fractals.low.length) / 10);
+      const trendConfidence = Math.abs(trend) * 0.8;
+      const confidence = Math.max(0, Math.min(1, (volatilityConfidence + fractalConfidence + trendConfidence) / 3));
+
+      predictions.push({
+        period: i,
+        price: parseFloat(predictedPrice.toFixed(2)),
+        change: parseFloat(((predictedPrice - currentPrice) / currentPrice * 100).toFixed(2)),
+        confidence: parseFloat((confidence * 100).toFixed(1))
+      });
+    }
+
+    return predictions;
+  }
+};
+
+// ════════════════════════════════════════════════════════════════
+// 🎮 UI INTERACTIONS
+// ════════════════════════════════════════════════════════════════
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const tabGroup = e.target.closest('.tabs-container');
+    const tabName = e.target.dataset.tab;
+    
+    // Remove active class from all buttons in this group
+    tabGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+
+    // Hide/Show tabs
+    if (tabName === 'chart') {
+      document.getElementById('chart-tab').style.display = 'block';
+      document.getElementById('ai-pred-tab').classList.remove('show');
+      document.getElementById('fractals-tab').classList.remove('show');
+    } else if (tabName === 'ai-pred') {
+      document.getElementById('chart-tab').style.display = 'none';
+      document.getElementById('ai-pred-tab').classList.add('show');
+      document.getElementById('fractals-tab').classList.remove('show');
+    } else if (tabName === 'fractals') {
+      document.getElementById('chart-tab').style.display = 'none';
+      document.getElementById('ai-pred-tab').classList.remove('show');
+      document.getElementById('fractals-tab').classList.add('show');
+    }
+  });
+});
+
+// ════════════════════════════════════════════════════════════════
+// 📊 SAMPLE DATA & INITIALIZATION
+// ════════════════════════════════════════════════════════════════
+
+function initializeCharts() {
+  // Sample data for demonstration
+  const sampleCandles = [
+    {time:1,open:100,high:105,low:99,close:102,volume:1000},
+    {time:2,open:102,high:108,low:101,close:107,volume:1200},
+    {time:3,open:107,high:110,low:106,close:109,volume:1100},
+    {time:4,open:109,high:112,low:108,close:110,volume:1300},
+    {time:5,open:110,high:114,low:109,close:112,volume:1400},
+    {time:6,open:112,high:115,low:111,close:113,volume:1500},
+    {time:7,open:113,high:116,low:112,close:114,volume:1600},
+    {time:8,open:114,high:117,low:113,close:115,volume:1700},
+    {time:9,open:115,high:118,low:114,close:116,volume:1800},
+    {time:10,open:116,high:119,low:115,close:117,volume:1900},
+    {time:11,open:117,high:120,low:116,close:118,volume:2000},
+    {time:12,open:118,high:121,low:117,close:119,volume:2100},
+    {time:13,open:119,high:122,low:118,close:120,volume:2200},
+    {time:14,open:120,high:123,low:119,close:121,volume:2300},
+    {time:15,open:121,high:124,low:120,close:122,volume:2400}
+  ];
+
+  const tp1 = 125, tp2 = 130, entry = 120;
+  const predictions = AIPredictor.predictPrices(sampleCandles, tp1, tp2, entry, 15, 0.8);
+  const fractals = AIPredictor.detectFractals(sampleCandles, 2);
+
+  // Draw main chart
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: sampleCandles.map((_, i) => `${i+1}`),
+      datasets: [
+        {
+          label: '📊 السعر التاريخي',
+          data: sampleCandles.map(c => c.close),
+          borderColor: '#4a9eff',
+          backgroundColor: 'rgba(74,158,255,.05)',
+          borderWidth: 2,
+          tension: 0.4,
+          pointRadius: 2,
+          fill: false
+        },
+        {
+          label: '🤖 التنبؤ',
+          data: [...Array(sampleCandles.length-1).fill(null), ...predictions.slice(0,5).map(p=>p.price)],
+          borderColor: '#a78bfa',
+          backgroundColor: 'rgba(167,139,250,.1)',
+          borderWidth: 2.5,
+          borderDash: [5, 5],
+          tension: 0.4,
+          pointRadius: 3,
+          fill: false
+        },
+        {
+          label: 'TP2',
+          data: Array(sampleCandles.length + 5).fill(tp2),
+          borderColor: '#f5c842',
+          borderWidth: 1.5,
+          borderDash: [3, 3],
+          pointRadius: 0,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          labels: { color: '#7a8ba8', font: { size: 10 } }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#7a8ba8' }, grid: { color: 'rgba(255,255,255,.05)' } },
+        y: { ticks: { color: '#7a8ba8' }, grid: { color: 'rgba(255,255,255,.05)' } }
+      }
+    }
+  });
+
+  // Draw prediction chart
+  const predCtx = document.getElementById('predChart').getContext('2d');
+  new Chart(predCtx, {
+    type: 'bar',
+    data: {
+      labels: predictions.map(p => `F${p.period}`),
+      datasets: [{
+        label: 'السعر المتنبأ به',
+        data: predictions.map(p => p.price),
+        backgroundColor: predictions.map(p => p.confidence > 70 ? 'rgba(14,207,126,.4)' : p.confidence > 50 ? 'rgba(245,200,66,.4)' : 'rgba(240,68,88,.4)'),
+        borderColor: predictions.map(p => p.confidence > 70 ? '#0ecf7e' : p.confidence > 50 ? '#f5c842' : '#f04458'),
+        borderWidth: 1
+      }]
+    },
+    options: {
+      indexAxis: 'x',
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { color: '#7a8ba8' }, grid: { color: 'rgba(255,255,255,.05)' } }
+      }
+    }
+  });
+
+  // Update AI Panel
+  const lastPred = predictions[0];
+  document.getElementById('pred-price').textContent = lastPred.price.toFixed(2) + ' ر.س';
+  
+  const confClass = lastPred.confidence > 70 ? 'conf-high' : lastPred.confidence > 50 ? 'conf-medium' : 'conf-low';
+  document.getElementById('conf-level').innerHTML = `<span class="conf-badge ${confClass}">${lastPred.confidence.toFixed(0)}% ثقة</span>`;
+  
+  document.getElementById('frac-count').textContent = fractals.high.length + fractals.low.length;
+
+  // Update prediction table
+  document.getElementById('pred-table').innerHTML = predictions.slice(0, 10).map(p => `
+    <tr>
+      <td>${p.period}</td>
+      <td style="color:${p.change > 0 ? '#0ecf7e' : '#f04458'}">${p.price.toFixed(2)}</td>
+      <td><span class="conf-badge ${p.confidence > 70 ? 'conf-high' : p.confidence > 50 ? 'conf-medium' : 'conf-low'}">${p.confidence.toFixed(0)}%</span></td>
+    </tr>
+  `).join('');
+
+  // Update fractal table
+  document.getElementById('fractal-table').innerHTML = [
+    ...fractals.high.slice(-3).map(f => `
+      <tr>
+        <td><span class="tag tag-up">High</span></td>
+        <td style="color:#0ecf7e">${f.price.toFixed(2)}</td>
+        <td>${f.time}</td>
+        <td>${(f.strength*100).toFixed(0)}%</td>
+      </tr>
+    `),
+    ...fractals.low.slice(-3).map(f => `
+      <tr>
+        <td><span class="tag tag-dn">Low</span></td>
+        <td style="color:#f04458">${f.price.toFixed(2)}</td>
+        <td>${f.time}</td>
+        <td>${(f.strength*100).toFixed(0)}%</td>
+      </tr>
+    `)
+  ].join('');
+}
+
+// Initialize on load
+window.addEventListener('load', initializeCharts);
+
+</script>
+
+</body>
+</html>
